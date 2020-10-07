@@ -8,32 +8,22 @@ def embedCreator(data):
         Creates the embedded message for the covid-19 stats
     """
     state = data["state"]
-    embedTitle = ":world_map: Covid Stats in " + state + " :world_map:"
-    firstField = {
-        "name": "Total " + state + " Cases",
-        "value": "Total Cases: {:,}".format(data["cases"]),
-        "inline": True
-    }
-    secondField = {
-        "name": "Total " + state + " Deaths",
-        "value": "Total Deaths: {:,}".format(data["deaths"]),
-        "inline": True
-    }
-    thirdField = {
-        "name": "Total " + state + " Tests",
-        "value": "Total Tests: {:,}".format(data["tests"]),
-        "inline": True
-    }
-    embed = discord.Embed(title=embedTitle, color=0x8D0000)
-    embed.description = "Statistics for Covid-19 in " + state + "\n"
+    embed_title = f":world_map: Covid Stats in {state} :world_map:"
+    embed = discord.Embed(title=embed_title, color=0x8D0000)
+    embed.description = f"Statistics for Covid-19 in {state}"
     embed.add_field(
-        name=firstField["name"], value=firstField["value"], inline=firstField["inline"])
+        name=f"Total {state} Cases",
+        value="Total Cases: {:,}".format(data['cases']),
+        inline=True)
     embed.add_field(
-        name=secondField["name"], value=secondField["value"], inline=secondField["inline"])
+        name=f"Total {state} Deaths",
+        value="Total Deaths: {:,}".format(data['deaths']),
+        inline=True)
     embed.add_field(
-        name=thirdField["name"], value=thirdField["value"], inline=thirdField["inline"])
+        name=f"Total {state} Cases",
+        value="Total Tests: {:,}".format(data['tests']),
+        inline=True)
     embed.set_footer(text="Data from corona.lmao.ninja")
-
     return embed
 
 
@@ -42,23 +32,20 @@ class CovidCog(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def covid(self, ctx):
+    async def covid(self, ctx, *state_name):
         """
-        Requests data from corona.lmao.ninja and parses it based on the users
-        inputted state
+        Request Covid Data per State
         """
-        r = requests.get("https://corona.lmao.ninja/v2/states")
-        apidata = r.json()
-        state = ctx.message.content[7:].title()
-        returningData = {}
-        for stateData in apidata:
-            if stateData["state"] == state:
-                returningData = stateData
-        if returningData != {}:
-            await ctx.send(embed=embedCreator(returningData))
-            print(returningData)
-        else:
+        state_name = " ".join(state_name).title()
+        api_data = requests.get("https://corona.lmao.ninja/v2/states").json()
+
+        try:
+            returning_data, *_ = [state_data for state_data in api_data if state_data["state"] == state_name]
+        except ValueError:
             await ctx.send("State not found")
+            return
+
+        await ctx.send(embed=embedCreator(returning_data))
 
 
 def setup(bot):

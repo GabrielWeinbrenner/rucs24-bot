@@ -33,6 +33,7 @@ features = [
     "google",
     "log",
     "covid",
+    "affirmation",
 ]
 
 # Load extensions specified in features

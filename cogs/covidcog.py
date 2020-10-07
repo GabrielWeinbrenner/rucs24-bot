@@ -4,6 +4,9 @@ import requests
 
 
 def embedCreator(data):
+    """
+        Creates the embedded message for the covid-19 stats
+    """
     state = data["state"]
     embedTitle = ":world_map: Covid Stats in " + state + " :world_map:"
     firstField = {
@@ -40,6 +43,10 @@ class CovidCog(commands.Cog):
 
     @commands.command()
     async def covid(self, ctx):
+        """
+        Requests data from corona.lmao.ninja and parses it based on the users
+        inputted state
+        """
         r = requests.get("https://corona.lmao.ninja/v2/states")
         apidata = r.json()
         state = ctx.message.content[7:].title()

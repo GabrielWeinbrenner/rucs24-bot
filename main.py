@@ -32,6 +32,7 @@ features = [
     "latex",
     "google",
     "log",
+    "covid",
 ]
 
 # Load extensions specified in features
